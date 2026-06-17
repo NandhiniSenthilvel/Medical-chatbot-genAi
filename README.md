@@ -15,7 +15,7 @@ An end-to-end Generative AI Medical Chatbot developed using advanced Retrieval-A
 * **Core Framework:** LangChain / LangChain-Community
 * **Embedding Model:** `sentence-transformers/all-MiniLM-L6-v2` (384 Dimensions)
 * **Vector Database:** Pinecone (Cloud Serverless Index)
-* **LLM Engine:** OpenAI `gpt-4o-mini`
+* **LLM Engine:** Google Gemini `gemini-1.5-flash`
 
 ---
 

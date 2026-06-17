@@ -17,8 +17,8 @@ class MedicalBotPipeline:
             "PINECONE_API_KEY", 
             "pcsk_5EM81u_88V4e3B9chnLx3kY1qEfnm89UuJRRPDVSFtaM74h59vnaNYSMJxL2PxD5B8v3ox"
         )
-        os.environ["GOOGLE_API_KEY"] = os.getenv(
-            "GOOGLE_API_KEY", 
+        os.environ["GEMINI_API_KEY"] = os.getenv(
+            "GEMINI_API_KEY", 
             "AQ.Ab8RN6Jw4Qu7ud3leyhX0TzI2MQxw-nV9yLOUSB8DKmmDklE8g"
         )
 

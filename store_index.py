@@ -22,7 +22,7 @@ print("--- Starting Clean Native Pipeline ---")
 print("Step 1: Extracting text from PDF data source...")
 if not os.path.exists(DATA_DIR):
     os.makedirs(DATA_DIR)
-    print(f"[⚠️ WARNING] Data folder '{DATA_DIR}' was empty or missing. Please paste your medical PDF inside it.")
+    print(f"[WARNING] Data folder '{DATA_DIR}' was empty or missing. Please paste your medical PDF inside it.")
 
 loader = PyPDFDirectoryLoader(DATA_DIR)
 raw_documents = loader.load()
@@ -71,4 +71,4 @@ docsearch = PineconeVectorStore.from_documents(
     index_name=INDEX_NAME
 )
 
-print("🚀 --- Pipeline Complete! Pinecone Vector Store initialized successfully! ---")
+print("Pipeline Complete! Pinecone Vector Store initialized successfully!")

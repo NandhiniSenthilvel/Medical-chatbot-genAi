@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Medical AI Assistant</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <style>
+        body {
+            background-color: #12141c;
+            color: #e2e8f0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .chat-container {
+            max-width: 900px;
+            margin: 30px auto;
+            background: #1a1d29;
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            border: 1px solid #2d3142;
+            overflow: hidden;
+        }
+        .chat-header {
+            background: #232738;
+            padding: 20px;
+            border-bottom: 1px solid #2d3142;
+            display: flex;
+            align-items: center;
+        }
+        .bot-avatar {
+            width: 45px;
+            height: 45px;
+            background: #3b82f6;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            margin-right: 15px;
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.4);
+        }
+        .chat-box {
+            height: 500px;
+            overflow-y: auto;
+            padding: 25px;
+            background: #141622;
+        }
+        .chat-box::-webkit-scrollbar {
+            width: 6px;
+        }
+        .chat-box::-webkit-scrollbar-track {
+            background: #141622;
+        }
+        .chat-box::-webkit-scrollbar-thumb {
+            background: #2d3142;
+            border-radius: 3px;
+        }
+        .message {
+            display: flex;
+            margin-bottom: 20px;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .message-content {
+            max-width: 75%;
+            padding: 14px 18px;
+            border-radius: 14px;
+            font-size: 15px;
+            line-height: 1.5;
+        }
+        .message-content ul {
+            margin-bottom: 0;
+            padding-left: 20px;
+        }
+        .user-message {
+            justify-content: flex-end;
+        }
+        .user-message .message-content {
+            background: #3b82f6;
+            color: #ffffff;
+            border-bottom-right-radius: 2px;
+        }
+        .bot-message {
+            justify-content: flex-start;
+        }
+        .bot-message .message-content {
+            background: #232738;
+            color: #e2e8f0;
+            border-bottom-left-radius: 2px;
+            border: 1px solid #2d3142;
+        }
+        .chat-input-area {
+            background: #1a1d29;
+            padding: 20px;
+            border-top: 1px solid #2d3142;
+        }
+        .input-group {
+            background: #232738;
+            border: 1px solid #2d3142;
+            border-radius: 12px;
+            overflow: hidden;
+            transition: border-color 0.2s;
+        }
+        .input-group:focus-within {
+            border-color: #3b82f6;
+        }
+        .chat-input {
+            background: transparent !important;
+            border: none !important;
+            color: #e2e8f0 !important;
+            padding: 14px 20px;
+            box-shadow: none !important;
+        }
+        .chat-input::placeholder {
+            color: #64748b;
+        }
+        .send-btn {
+            background: transparent;
+            border: none;
+            color: #3b82f6;
+            padding: 0 25px;
+            font-size: 18px;
+            transition: color 0.2s, transform 0.1s;
+        }
+        .send-btn:hover {
+            color: #60a5fa;
+            transform: scale(1.05);
+        }
+        .typing-indicator span {
+            height: 8px;
+            width: 8px;
+            background: #64748b;
+            display: inline-block;
+            border-radius: 50%;
+            animation: bounce 1.3s infinite;
+            margin: 0 2px;
+        }
+        .typing-indicator span:nth-child(2) { animation-delay: 0.15s; }
+        .typing-indicator span:nth-child(3) { animation-delay: 0.3s; }
+        @keyframes bounce {
+            0%, 60%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-6px); }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="chat-container">
+        <div class="chat-header">
+            <div class="bot-avatar">
+                <i class="fa-solid fa-user-md"></i>
+            </div>
+            <div>
+                <h5 class="mb-0 font-weight-bold">Clinical AI Engine</h5>
+                <span class="text-success small"><i class="fa-solid fa-circle font-size-10 me-1"></i> RAG Pipeline Active</span>
+            </div>
+        </div>
+
+        <div class="chat-box" id="chatBox">
+            <div class="message bot-message">
+                <div class="message-content">
+                    Hello! I am your clinical assistant. Ask me anything regarding disease symptoms, diagnoses, or treatments from your textbook repository.
+                </div>
+            </div>
+        </div>
+
+        <div class="chat-input-area">
+            <form id="chatForm">
+                <div class="input-group">
+                    <input type="text" id="userInput" class="form-control chat-input" placeholder="Type your medical query here..." autocomplete="off" required>
+                    <button type="submit" class="send-btn">
+                        <i class="fa-solid fa-paper-plane"></i>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script>
+    $(document).ready(function() {
+        const chatBox = $('#chatBox');
+        const chatForm = $('#chatForm');
+        const userInput = $('#userInput');
+
+        function scrollToBottom() {
+            chatBox.animate({ scrollTop: chatBox[0].scrollHeight }, 300);
+        }
+
+        chatForm.on('submit', function(e) {
+            e.preventDefault();
+            
+            const rawMessage = userInput.val().trim();
+            if (!rawMessage) return;
+
+            // 1. Append User Text Frame
+            const userHtml = `
+                <div class="message user-message">
+                    <div class="message-content">${rawMessage}</div>
+                </div>
+            `;
+            chatBox.append(userHtml);
+            userInput.val('');
+            scrollToBottom();
+
+            // 2. Append Transient Typing Loading Sequence
+            const loadingId = 'loading_' + Date.now();
+            const loadingHtml = `
+                <div class="message bot-message" id="${loadingId}">
+                    <div class="message-content">
+                        <div class="typing-indicator">
+                            <span></span><span></span><span></span>
+                        </div>
+                    </div>
+                </div>
+            `;
+            chatBox.append(loadingHtml);
+            scrollToBottom();
+
+            // 3. Dispatch Form Encoded Payload directly to Flask System Routers
+            $.ajax({
+                type: 'POST',
+                url: '/get',
+                data: { msg: rawMessage },
+                success: function(data) {
+                    $(`#${loadingId}`).remove();
+                    
+                    // Client-side markdown processor string conversions
+                    let processedText = data.response
+                        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') // Convert **text** to bold
+                        .replace(/^\s*\*\s+(.*)$/gm, '<li>$1</li>')       // Convert lines starting with * to list items
+                        .replace(/\n/g, '<br>');                          // Convert line breaks to HTML breaks
+
+                    // Wrap isolated groups of <li> tags into a clear <ul> list block
+                    if (processedText.includes('<li>')) {
+                        processedText = processedText.replace(/(<li>.*<\/li>)/s, '<ul>$1</ul>');
+                    }
+
+                    const botHtml = `
+                        <div class="message bot-message">
+                            <div class="message-content">${processedText}</div>
+                        </div>
+                    `;
+                    chatBox.append(botHtml);
+                    scrollToBottom();
+                },
+                error: function(xhr, status, error) {
+                    $(`#${loadingId}`).remove();
+                    const errorHtml = `
+                        <div class="message bot-message">
+                            <div class="message-content text-danger">
+                                <i class="fa-solid fa-triangle-exclamation me-2"></i> Failed to reach server. Please review runtime logs.
+                            </div>
+                        </div>
+                    `;
+                    chatBox.append(errorHtml);
+                    scrollToBottom();
+                }
+            });
+        });
+    });
+</script>
+</body>
+</html>
